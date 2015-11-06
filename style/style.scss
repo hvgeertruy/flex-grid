@@ -1,8 +1,14 @@
-$borderColor: #f00;
+
+// TODOS:
+// - flex-offset
+// - more OO approach to setting up cols
+// - handles for flex justify-content property, so you can decide what flexbox does w/ incomplete row items (ex. fill row or leave empty space)
+
 
 $mq_s: 320px;
 $mq_m: 520px;
 $mq_l: 920px;
+$borderColor: #f00;
 $gutter_width: 20px;
 $legacy_columnCount: 4;
 
@@ -231,7 +237,6 @@ body {
     }
 
     @media screen and (min-width: $mq_l)  {
-
         .flex-col-1-12 {
             @include calcColumnWidth(1, 12);
         }
