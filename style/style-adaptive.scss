@@ -1,0 +1,144 @@
+//Vars
+$mq_s: 320px;
+$mq_m: 520px;
+$mq_l: 920px;
+$mq_max: 1002px;
+$base_em: 16px;
+$borderColor: #afafaf;
+$gutter_width: 20px;
+$legacy_columnCount: 4;
+
+
+
+//Base / other non-essentials
+.flex [class*="col"] {
+    outline: 1px solid $borderColor;
+    
+    [class*="col"] {
+        outline: 1px solid #f00;
+    }
+}
+
+img {
+    line-height: 0;
+    vertical-align: middle;
+}
+body {
+    @media screen and (min-width: $mq_s) { background-color: #f99; }
+    @media screen and (min-width: $mq_m) { background-color: #9f9; }
+    @media screen and (min-width: $mq_l) { background-color: #99f; }
+    font-size: $base_em;
+}
+
+.container {
+    min-width: $mq_s;
+    max-width: $mq_max;
+    margin: 0 auto;
+}
+
+[class*="flex-col"] {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+//valign
+/*Important: wrap your text in a <p>! (or something else that is displayblocky) */
+.flex-valign {
+    display: flex;
+    > * {
+        display: flex;
+        flex-basis: 100%;
+        align-items: center;
+    }
+}
+
+
+
+//Grid system
+@mixin calcColumnWidth($numberOfColumns, $totalColumns) {
+    flex-basis: calc(#{$numberOfColumns} * ((100%)/#{$totalColumns}) - #{$gutter_width}); //Longhand is intentional; IE does not support calc on shorthand flex property
+    
+    .flex-grid-no-gutter & {
+        flex-basis: $numberOfColumns * (100%)/$totalColumns;
+    }
+}
+
+[class*="flex-col"] {
+    box-sizing: border-box;
+    margin-left: 10px;
+    margin-right: 10px;
+    flex: 1 1;
+
+    //No gutter opt-in
+    .flex-grid-no-gutter & {
+        margin: 0;
+    }
+}
+
+//Nesting; compensate for stacking gutter
+.flex-grid .flex-grid {
+    margin: -$gutter_width/2;
+}
+
+/* < Ie10 fallback*/
+.gtie7 {
+    .flex-grid {
+        //Clearfix..
+        &:before, &:after { content: " "; display: table; }
+        &:after { clear: both; }
+        *zoom: 1;
+
+        [class*="flex-col"] {
+            float: left;
+            width: calc((100%/#{$legacy_columnCount}) - #{$gutter_width}); //Predefined width for all columns, otherwise determining gutters will be problematic
+        }
+
+        @media screen and (max-width: $mq_m)  {
+            [class*="flex-col"] {
+                width: calc(100% - #{$gutter_width});
+            }
+        }
+    }
+}
+
+.flex {
+    width: 100%;
+    background-color: #efefef;
+    margin: 0 auto;
+}
+.flex-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    &.flex-grid-align-left {
+        justify-content: flex-start;
+        [class*="flex-col"] {
+            flex-grow: 0;
+        }
+    }
+
+    &.flex-grid-align-right {
+        justify-content: flex-end;
+        [class*="flex-col"] {
+            flex-grow: 0;
+        }
+    }
+}
+
+//flex-col-x-y
+$grid_columns: 12;
+@for $i from 1 through $grid_columns {
+    .flex-col-#{$i}-#{$grid_columns} { 
+        @include calcColumnWidth($i, $grid_columns);
+    }
+}
+
+//flex-col-min-x
+// IMPORTANT: for nested grids, child mininum should not exceed parent minimum. OR expect overflow..
+$multiplier: 2;
+@for $i from 1 through $mq_max/$base_em/$multiplier {
+    .flex-col-min-#{($i*$multiplier)} { 
+        min-width: $i*$multiplier+em; /* #{$i*$multiplier*$base_em} px*/
+    }
+}
