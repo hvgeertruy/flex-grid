@@ -1,17 +1,23 @@
 
 // TODOS:
 // - flex-offset
-// - more OO approach to setting up cols
-// - handles for flex justify-content property, so you can decide what flexbox does w/ incomplete row items (ex. fill row or leave empty space)
+// - reverse implementation of gutters (base off - opt-in for on), but still adding gutters by default.
+// - research vw, vh
 
 
+
+//Vars
 $mq_s: 320px;
 $mq_m: 520px;
 $mq_l: 920px;
-$borderColor: #f00;
+$mq_max: 1002px;
+$borderColor: #afafaf;
 $gutter_width: 20px;
 $legacy_columnCount: 4;
 
+
+
+//Base / other non-essentials
 .flex [class*="col"] {
     outline: 1px solid $borderColor;
 }
@@ -27,24 +33,53 @@ body {
 }
 
 .container {
-    min-width: 320px;
-    max-width: 1002px;
+    min-width: $mq_s;
+    max-width: $mq_max;
     margin: 0 auto;
 }
 
+[class*="flex-col"] {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+
+//valign
+/*Important: wrap your text in a <p>! (or something else that is displayblocky) */
+.flex-valign {
+    display: flex;
+    > * {
+        display: flex;
+        flex-basis: 100%;
+        align-items: center;
+    }
+}
+
+
+
+//Grid system
 @mixin calcColumnWidth($numberOfColumns, $totalColumns) {
-    flex: 1 1;
     flex-basis: calc(#{$numberOfColumns} * ((100%)/#{$totalColumns}) - #{$gutter_width}); //Longhand is intentional; IE does not support calc on shorthand flex property
+    
+    .flex-grid-no-gutter & {
+        flex-basis: $numberOfColumns * (100%)/$totalColumns;
+    }
 }
 
 [class*="flex-col"] {
     box-sizing: border-box;
-    margin: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    flex: 1 1;
+
+    //No gutter opt-in
+    .flex-grid-no-gutter & {
+        margin: 0;
+    }
 }
+
 //Nesting; compensate for stacking gutter
-.flex-grid-no-gutter [class*="flex-col"] {
-    margin: 0;
-}
 .flex-grid .flex-grid {
     margin: -$gutter_width/2;
 }
@@ -68,7 +103,6 @@ body {
             }
         }
     }
-
 }
 
 .flex {
@@ -81,248 +115,252 @@ body {
     flex-wrap: wrap;
     justify-content: space-between;
 
+    &.flex-grid-align-left {
+        justify-content: flex-start;
+        [class*="flex-col"] {
+            flex-grow: 0;
+        }
+    }
+
+    &.flex-grid-align-right {
+        justify-content: flex-end;
+        [class*="flex-col"] {
+            flex-grow: 0;
+        }
+    }
+}
+
+.flex-col-1-12,
+.flex-col-1-8,
+.flex-col-1-6,
+.flex-col-2-12,
+.flex-col-1-4,
+.flex-col-2-8,
+.flex-col-1-3,
+.flex-col-2-6,
+.flex-col-4-12,
+.flex-col-3-4,
+.flex-col-6-8,
+.flex-col-9-12,
+.flex-col-5-6,
+.flex-col-10-12,
+.flex-col-7-8,
+.flex-col-11-12,
+.flex-col-s-1-3 {
+    @include calcColumnWidth(1, 3);
+}
+
+.flex-col-3-8,
+.flex-col-2-3,
+.flex-col-4-6,
+.flex-col-8-12,
+.flex-col-5-8,
+.flex-col-s-2-3 {
+    @include calcColumnWidth(2, 3);
+}    
+
+.flex-col-5-12,
+.flex-col-1-2,
+.flex-col-2-4,
+.flex-col-3-6,
+.flex-col-4-8,
+.flex-col-6-12,
+.flex-col-7-12,
+.flex-col-s-1-2 {
+    @include calcColumnWidth(1, 2);
+}
+
+.flex-col-1-1,
+.flex-col-s-1-1 {
+    @include calcColumnWidth(1, 1);
+}
+
+@media screen and (min-width: $mq_m)  {
     .flex-col-1-12,
+    .flex-col-m-1-12 {
+        @include calcColumnWidth(1, 12);
+    }
+
     .flex-col-1-8,
-    .flex-col-1-6,
+    .flex-col-m-1-8 {
+        @include calcColumnWidth(1, 8);
+    }
+
+    .flex-col-1-6, 
     .flex-col-2-12,
+    .flex-col-m-1-6, 
+    .flex-col-m-2-12 {
+        @include calcColumnWidth(1, 6);
+    }
+
     .flex-col-1-4,
     .flex-col-2-8,
+    .flex-col-3-12,
+    .flex-col-m-1-4,
+    .flex-col-m-2-8,
+    .flex-col-m-3-12 {
+        @include calcColumnWidth(1, 4);
+    }
+
     .flex-col-1-3,
     .flex-col-2-6,
     .flex-col-4-12,
-    .flex-col-3-4,
-    .flex-col-6-8,
-    .flex-col-9-12,
-    .flex-col-5-6,
-    .flex-col-10-12,
-    .flex-col-7-8,
-    .flex-col-11-12,
-    .flex-col-s-1-3 {
+    .flex-col-m-1-3,
+    .flex-col-m-2-6,
+    .flex-col-m-4-12 {
         @include calcColumnWidth(1, 3);
     }
 
     .flex-col-3-8,
-    .flex-col-2-3,
-    .flex-col-4-6,
-    .flex-col-8-12,
-    .flex-col-5-8,
-    .flex-col-s-2-3 {
-        @include calcColumnWidth(2, 3);
-    }    
+    .flex-col-m-3-8 {
+        @include calcColumnWidth(3, 8);
+    }
 
     .flex-col-5-12,
+    .flex-col-m-5-12 {
+        @include calcColumnWidth(5, 12);
+    }
+
     .flex-col-1-2,
     .flex-col-2-4,
     .flex-col-3-6,
     .flex-col-4-8,
     .flex-col-6-12,
-    .flex-col-7-12,
-    .flex-col-s-1-2 {
+    .flex-col-m-1-2,
+    .flex-col-m-2-4,
+    .flex-col-m-3-6,
+    .flex-col-m-4-8,
+    .flex-col-m-6-12 {
         @include calcColumnWidth(1, 2);
     }
 
+    .flex-col-7-12,
+    .flex-col-m-7-12 {
+        @include calcColumnWidth(7, 12);
+    }
+
+    .flex-col-5-8,
+    .flex-col-m-5-8 {
+        @include calcColumnWidth(5, 8);
+    }
+
+    .flex-col-2-3,
+    .flex-col-4-6,
+    .flex-col-8-12,
+    .flex-col-m-2-3,
+    .flex-col-m-4-6,
+    .flex-col-m-8-12 {
+        @include calcColumnWidth(2, 3);
+    }
+
+    .flex-col-3-4,
+    .flex-col-6-8,
+    .flex-col-9-12,
+    .flex-col-m-3-4,
+    .flex-col-m-6-8,
+    .flex-col-m-9-12 {
+        @include calcColumnWidth(3, 4);
+    }
+
+    .flex-col-5-6,
+    .flex-col-10-12,
+    .flex-col-m-5-6,
+    .flex-col-m-10-12 {
+        @include calcColumnWidth(5, 6);
+    }
+
+    .flex-col-7-8,
+    .flex-col-m-7-8 {
+        @include calcColumnWidth(7, 8);
+    }
+
+    .flex-col-11-12,
+    .flex-col-m-11-12 {
+        @include calcColumnWidth(11, 12);
+    }
+
     .flex-col-1-1,
-    .flex-col-s-1-1 {
-        @include calcColumnWidth(1, 1);
-    }
-
-    @media screen and (min-width: $mq_m)  {
-        .flex-col-1-12,
-        .flex-col-m-1-12 {
-            @include calcColumnWidth(1, 12);
-        }
-
-        .flex-col-1-8,
-        .flex-col-m-1-8 {
-            @include calcColumnWidth(1, 8);
-        }
-
-        .flex-col-1-6, 
-        .flex-col-2-12,
-        .flex-col-m-1-6, 
-        .flex-col-m-2-12 {
-            @include calcColumnWidth(1, 6);
-        }
-
-        .flex-col-1-4,
-        .flex-col-2-8,
-        .flex-col-3-12,
-        .flex-col-m-1-4,
-        .flex-col-m-2-8,
-        .flex-col-m-3-12 {
-            @include calcColumnWidth(1, 4);
-        }
-
-        .flex-col-1-3,
-        .flex-col-2-6,
-        .flex-col-4-12,
-        .flex-col-m-1-3,
-        .flex-col-m-2-6,
-        .flex-col-m-4-12 {
-            @include calcColumnWidth(1, 3);
-        }
-
-        .flex-col-3-8,
-        .flex-col-m-3-8 {
-            @include calcColumnWidth(3, 8);
-        }
-
-        .flex-col-5-12,
-        .flex-col-m-5-12 {
-            @include calcColumnWidth(5, 12);
-        }
-
-        .flex-col-1-2,
-        .flex-col-2-4,
-        .flex-col-3-6,
-        .flex-col-4-8,
-        .flex-col-6-12,
-        .flex-col-m-1-2,
-        .flex-col-m-2-4,
-        .flex-col-m-3-6,
-        .flex-col-m-4-8,
-        .flex-col-m-6-12 {
-            @include calcColumnWidth(1, 2);
-        }
-
-        .flex-col-7-12,
-        .flex-col-m-7-12 {
-            @include calcColumnWidth(7, 12);
-        }
-
-        .flex-col-5-8,
-        .flex-col-m-5-8 {
-            @include calcColumnWidth(5, 8);
-        }
-
-        .flex-col-2-3,
-        .flex-col-4-6,
-        .flex-col-8-12,
-        .flex-col-m-2-3,
-        .flex-col-m-4-6,
-        .flex-col-m-8-12 {
-            @include calcColumnWidth(2, 3);
-        }
-
-        .flex-col-3-4,
-        .flex-col-6-8,
-        .flex-col-9-12,
-        .flex-col-m-3-4,
-        .flex-col-m-6-8,
-        .flex-col-m-9-12 {
-            @include calcColumnWidth(3, 4);
-        }
-
-        .flex-col-5-6,
-        .flex-col-10-12,
-        .flex-col-m-5-6,
-        .flex-col-m-10-12 {
-            @include calcColumnWidth(5, 6);
-        }
-
-        .flex-col-7-8,
-        .flex-col-m-7-8 {
-            @include calcColumnWidth(7, 8);
-        }
-
-        .flex-col-11-12,
-        .flex-col-m-11-12 {
-            @include calcColumnWidth(11, 12);
-        }
-
-        .flex-col-1-1,
-        .flex-col-m-1-1 {
-            @include calcColumnWidth(12, 12);
-        }
-    }
-
-    @media screen and (min-width: $mq_l)  {
-        .flex-col-1-12 {
-            @include calcColumnWidth(1, 12);
-        }
-
-        .flex-col-1-8 {
-            @include calcColumnWidth(1, 8);
-        }
-
-        .flex-col-1-6, 
-        .flex-col-2-12 {
-            @include calcColumnWidth(1, 6);
-        }
-
-        .flex-col-1-4,
-        .flex-col-2-8,
-        .flex-col-3-12 {
-            @include calcColumnWidth(1, 4);
-        }
-
-        .flex-col-1-3,
-        .flex-col-2-6,
-        .flex-col-4-12 {
-            @include calcColumnWidth(1, 3);
-        }
-
-        .flex-col-3-8 {
-            @include calcColumnWidth(3, 8);
-        }
-
-        .flex-col-5-12 {
-            @include calcColumnWidth(5, 12);
-        }
-
-        .flex-col-1-2,
-        .flex-col-2-4,
-        .flex-col-3-6,
-        .flex-col-4-8,
-        .flex-col-6-12 {
-            @include calcColumnWidth(1, 2);
-        }
-
-        .flex-col-7-12 {
-            @include calcColumnWidth(7, 12);
-        }
-
-        .flex-col-5-8 {
-            @include calcColumnWidth(5, 8);
-        }
-
-        .flex-col-2-3,
-        .flex-col-4-6,
-        .flex-col-8-12 {
-            @include calcColumnWidth(2, 3);
-        }
-
-        .flex-col-3-4,
-        .flex-col-6-8,
-        .flex-col-9-12 {
-            @include calcColumnWidth(3, 4);
-        }
-
-        .flex-col-5-6,
-        .flex-col-10-12 {
-            @include calcColumnWidth(5, 6);
-        }
-
-        .flex-col-7-8 {
-            @include calcColumnWidth(7, 8);
-        }
-
-        .flex-col-11-12 {
-            @include calcColumnWidth(11, 12);
-        }
-
-        .flex-col-1-1 {
-            @include calcColumnWidth(12, 12);
-        }
+    .flex-col-m-1-1 {
+        @include calcColumnWidth(12, 12);
     }
 }
 
-/*Important: wrap your text in a <p>! (or something else that is displayblocky) */
-.flex-valign {
-    display: flex;
-    > * {
-        display: flex;
-        flex-basis: 100%;
-        align-items: center;
+@media screen and (min-width: $mq_l)  {
+    .flex-col-1-12 {
+        @include calcColumnWidth(1, 12);
+    }
+
+    .flex-col-1-8 {
+        @include calcColumnWidth(1, 8);
+    }
+
+    .flex-col-1-6, 
+    .flex-col-2-12 {
+        @include calcColumnWidth(1, 6);
+    }
+
+    .flex-col-1-4,
+    .flex-col-2-8,
+    .flex-col-3-12 {
+        @include calcColumnWidth(1, 4);
+    }
+
+    .flex-col-1-3,
+    .flex-col-2-6,
+    .flex-col-4-12 {
+        @include calcColumnWidth(1, 3);
+    }
+
+    .flex-col-3-8 {
+        @include calcColumnWidth(3, 8);
+    }
+
+    .flex-col-5-12 {
+        @include calcColumnWidth(5, 12);
+    }
+
+    .flex-col-1-2,
+    .flex-col-2-4,
+    .flex-col-3-6,
+    .flex-col-4-8,
+    .flex-col-6-12 {
+        @include calcColumnWidth(1, 2);
+    }
+
+    .flex-col-7-12 {
+        @include calcColumnWidth(7, 12);
+    }
+
+    .flex-col-5-8 {
+        @include calcColumnWidth(5, 8);
+    }
+
+    .flex-col-2-3,
+    .flex-col-4-6,
+    .flex-col-8-12 {
+        @include calcColumnWidth(2, 3);
+    }
+
+    .flex-col-3-4,
+    .flex-col-6-8,
+    .flex-col-9-12 {
+        @include calcColumnWidth(3, 4);
+    }
+
+    .flex-col-5-6,
+    .flex-col-10-12 {
+        @include calcColumnWidth(5, 6);
+    }
+
+    .flex-col-7-8 {
+        @include calcColumnWidth(7, 8);
+    }
+
+    .flex-col-11-12 {
+        @include calcColumnWidth(11, 12);
+    }
+
+    .flex-col-1-1 {
+        @include calcColumnWidth(12, 12);
     }
 }
