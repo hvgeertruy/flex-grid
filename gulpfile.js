@@ -3,12 +3,12 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('styles', function() {
-    gulp.src('style/style.scss')
+    gulp.src('style/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(gulp.dest('build'));
 });
 
 gulp.task('watch', function() {
-    gulp.watch('style/style.scss', ['styles']);
+    gulp.watch('style/*.scss', ['styles']);
 });
