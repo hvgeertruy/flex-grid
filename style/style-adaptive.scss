@@ -1,3 +1,6 @@
+// NOTES:
+// - missing align-left & align-right (flex-start & flex-end) as we are dependent on flex-grow (which will counter flex-start & flex-end)
+
 //Vars
 $mq_s: 320px;
 $mq_m: 520px;
@@ -110,20 +113,6 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-
-    &.flex-grid-align-left {
-        justify-content: flex-start;
-        [class*="flex-col"] {
-            flex-grow: 0;
-        }
-    }
-
-    &.flex-grid-align-right {
-        justify-content: flex-end;
-        [class*="flex-col"] {
-            flex-grow: 0;
-        }
-    }
 }
 
 //flex-col-x-y
